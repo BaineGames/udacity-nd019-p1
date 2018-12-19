@@ -5,7 +5,7 @@ class ShelfChanger extends Component {
     return (
       <div className="book-shelf-changer">
         <select
-          value={this.props.book.shelf}
+          value={this.props.book.shelf ? this.props.book.shelf : "none"}
           onChange={input =>
             this.props.onShelfChange(this.props.book, input.target.value)
           }
