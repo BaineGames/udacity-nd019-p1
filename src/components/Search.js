@@ -9,6 +9,25 @@ class Search extends Component {
     query: ""
   };
 
+  startSearch = input => {
+    if (input.length !== 0) {
+      BooksAPI.search(input).then(books => {
+        if (books.length > 0) {
+          books = this.changeBookShelf(books);
+          this.setState(() => {
+            return { Books: books };
+          });
+        }
+      });
+    } else {
+      this.setState({ Books: [], query: "" });
+    }
+  };
+
+  addToShelf = (book, shelf) => {
+    this.props.onChange(book, shelf);
+  };
+
   handleChange = event => {
     var value = event.target.value;
     this.setState(() => {
@@ -29,25 +48,6 @@ class Search extends Component {
       }
     }
     return books;
-  };
-
-  startSearch = input => {
-    if (input.length !== 0) {
-      BooksAPI.search(input).then(books => {
-        if (books.length > 0) {
-          books = this.changeBookShelf(books);
-          this.setState(() => {
-            return { Books: books };
-          });
-        }
-      });
-    } else {
-      this.setState({ Books: [], query: "" });
-    }
-  };
-
-  addToShelf = (book, shelf) => {
-    this.props.onChange(book, shelf);
   };
 
   render() {
