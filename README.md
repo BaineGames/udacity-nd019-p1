@@ -6,6 +6,7 @@ This is myReads project for the React Nanodegree program. This [rubric](https://
 
 To get started right away:
 
+* clone this repository and insure you have the latest version of nodeJS installed
 * install all project dependencies with `npm install`
 * start the development server with `npm start`
 
