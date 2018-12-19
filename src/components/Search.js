@@ -1,75 +1,84 @@
 import React, { Component } from "react";
-import * as BooksAPI from "../BooksAPI";
 import { Link } from "react-router-dom";
-import ShelfChanger from "../ShelfChanger";
-class SearchPage extends Component {
+import * as BooksAPI from "../BooksAPI";
+import Book from "./Book";
+
+class Search extends Component {
   state = {
-    searchResults: this.props.searchResults,
-    books: this.props.books
+    Books: [],
+    query: ""
   };
 
-  search = e => {
-    if (e.target.value.length > 0) {
-      BooksAPI.search(e.target.value).then(searchResults =>
-        this.setState({ searchResults: searchResults })
-      );
+  handleChange = event => {
+    var value = event.target.value;
+    this.setState(() => {
+      return { query: value };
+    });
+    this.startSearch(value);
+  };
+
+  changeBookShelf = books => {
+    let bookCollection = this.props.myBooks;
+
+    for (let book of books) {
+      book.shelf = "none";
+      for (let item of bookCollection) {
+        if (item.id === book.id) {
+          book.shelf = item.shelf;
+        }
+      }
+    }
+    return books;
+  };
+
+  startSearch = input => {
+    if (input.length !== 0) {
+      BooksAPI.search(input).then(books => {
+        if (books.length > 0) {
+          books = this.changeBookShelf(books);
+          this.setState(() => {
+            return { Books: books };
+          });
+        }
+      });
     } else {
-      this.setState({ searchResults: [] });
+      this.setState({ Books: [], query: "" });
     }
   };
 
+  addToShelf = (book, shelf) => {
+    this.props.onChange(book, shelf);
+  };
+
   render() {
-    const searchResults = this.props.searchResults;
     return (
       <div className="search-books">
         <div className="search-books-bar">
-          <Link to="/">
-            <button className="close-search">Close</button>
+          <Link to="/" className="close-search  fade-out-left">
+            Close
           </Link>
           <div className="search-books-input-wrapper">
             <input
               type="text"
               placeholder="Search by title or author"
-              onChange={this.search}
+              value={this.state.query}
+              onChange={this.handleChange}
             />
           </div>
         </div>
         <div className="search-books-results">
-          {this.state.searchResults.length > 0 ? (
+          {this.state.Books.length > 0 ? (
             <ol className="books-grid">
-              {this.state.searchResults.map((book, index) => (
-                <li key={index}>
-                  <div className="book roll-in-left">
-                    <div className="book-top">
-                      <div
-                        className="book-cover"
-                        style={{
-                          width: 128,
-                          height: 193,
-                          backgroundImage: `url(${
-                            book.imageLinks
-                              ? book.imageLinks.smallThumbnail
-                              : null
-                          })`
-                        }}
-                      />
-                      <ShelfChanger
-                        book={book}
-                        // onShelfChange={this.updateBook}
-                        books={this.state.books}
-                      />
-                    </div>
-                    <div className="book-title">{book.title}</div>
-                    {book.authors
-                      ? book.authors.map((author, index) => (
-                          <div className="book-authors" key={index}>
-                            {author}
-                          </div>
-                        ))
-                      : null}
-                  </div>
-                </li>
-              ))}
+              {this.state.query.length > 0 &&
+                this.state.Books.map((book, index) => (
+                  <Book
+                    book={book}
+                    key={index}
+                    onUpdate={shelf => {
+                      this.addToShelf(book, shelf);
+                    }}
+                  />
+                ))}
             </ol>
           ) : (
             <p id="noResults">No results found</p>
@@ -80,4 +89,4 @@ class SearchPage extends Component {
   }
 }
 
-export default SearchPage;
+export default Search;
