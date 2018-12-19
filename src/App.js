@@ -9,7 +9,6 @@ class BooksApp extends React.Component {
   state = {
     books: [],
     searchResults: [],
-    query: "",
     shelfs: [
       { name: "currentlyReading", dispName: "Currently Reading" },
       { name: "wantToRead", dispName: "Want to Read" },
@@ -27,8 +26,11 @@ class BooksApp extends React.Component {
     });
   };
 
+  reset = () => {
+    this.setState({ searchResults: [] });
+  };
+
   search = e => {
-    this.setState({ query: e.target.value });
     if (e.target.value.length > 0) {
       BooksAPI.search(e.target.value).then(searchResults =>
         this.setState({ searchResults })
@@ -53,7 +55,6 @@ class BooksApp extends React.Component {
                   <div className="search-books-input-wrapper">
                     <input
                       type="text"
-                      value={this.state.query}
                       placeholder="Search by title or author"
                       onChange={this.search}
                     />
@@ -162,7 +163,7 @@ class BooksApp extends React.Component {
                   </div>
                 </div>
                 <div className="open-search">
-                  <Link to="/search">
+                  <Link to="/search" onClick={this.reset}>
                     <button>Add a book</button>
                   </Link>
                 </div>
